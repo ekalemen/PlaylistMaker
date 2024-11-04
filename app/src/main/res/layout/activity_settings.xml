@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingRight="12dp"
+    android:background="@color/white"
+    tools:context=".SettingsActivity">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="24dp">
+
+        <ImageView
+            android:id="@+id/settings_button_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:gravity="center_vertical"
+            android:src="@drawable/settings_arrow_back"
+            app:tint="@color/main_black"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="4dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:text="@string/button_settings"
+            android:textAllCaps="false"
+            android:textColor="@color/main_black"
+            android:textSize="@dimen/settings_text_size"
+            android:layout_marginStart="24dp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_item_height"
+            android:gravity="center_vertical"
+            android:text="@string/list_item_theme"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/settings_item_text_size"
+            android:layout_marginStart="@dimen/settings_item_margin" />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_item_height"
+            android:checked="false"
+            android:layout_gravity="end"
+
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_item_height"
+            android:gravity="center_vertical"
+            android:text="@string/list_item_share"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/settings_item_text_size"
+            android:layout_marginStart="@dimen/settings_item_margin" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_item_height"
+            android:src="@drawable/settings_share"
+            android:layout_gravity="end"
+            app:tint="@color/settings_gray" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_item_height"
+            android:gravity="center_vertical"
+            android:text="@string/list_item_support"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/settings_item_text_size"
+            android:layout_marginStart="@dimen/settings_item_margin" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_item_height"
+            android:src="@drawable/settings_support"
+            android:layout_gravity="end"
+            app:tint="@color/settings_gray" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_item_height"
+            android:gravity="center_vertical"
+            android:text="@string/list_item_license"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="@dimen/settings_item_text_size"
+            android:layout_marginStart="@dimen/settings_item_margin" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_item_height"
+            android:layout_gravity="end"
+            android:src="@drawable/settings_list_arrow"
+            app:tint="@color/settings_gray" />
+    </FrameLayout>
+
+</LinearLayout>
