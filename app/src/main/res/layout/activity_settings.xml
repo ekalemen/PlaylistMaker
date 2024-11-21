@@ -3,11 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingRight="12dp"
-    android:background="@color/white"
+    style="@style/SettingsLinLayoutStyle"
     tools:context=".SettingsActivity">
 
     <LinearLayout
@@ -17,26 +13,13 @@
         android:layout_marginBottom="24dp">
 
         <ImageView
+            style="@style/SettingsTopHeaderImageView"
             android:id="@+id/settings_button_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/white"
-            android:gravity="center_vertical"
-            android:src="@drawable/settings_arrow_back"
-            app:tint="@color/main_black"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="4dp"/>
+            android:src="@drawable/settings_arrow_back" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:gravity="center_vertical"
-            android:text="@string/button_settings"
-            android:textAllCaps="false"
-            android:textColor="@color/main_black"
-            android:textSize="@dimen/settings_text_size"
-            android:layout_marginStart="24dp"
-            android:textStyle="bold" />
+            style="@style/SettingsTopHeaderTextView"
+            android:text="@string/button_settings" />
     </LinearLayout>
 
     <FrameLayout
@@ -45,88 +28,55 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/settings_item_height"
-            android:gravity="center_vertical"
-            android:text="@string/list_item_theme"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="@dimen/settings_item_text_size"
-            android:layout_marginStart="@dimen/settings_item_margin" />
+            style="@style/SettingsItemTextViewStyle"
+            android:text="@string/list_item_theme" />
 
         <Switch
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/settings_item_height"
-            android:checked="false"
-            android:layout_gravity="end"
-
+            style="@style/SettingsThemeSwitchStyle"
+            android:switchMinWidth="32dp"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
     </FrameLayout>
 
     <FrameLayout
+        android:id="@+id/settings_share_app_frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/settings_item_height"
-            android:gravity="center_vertical"
-            android:text="@string/list_item_share"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="@dimen/settings_item_text_size"
-            android:layout_marginStart="@dimen/settings_item_margin" />
+            style="@style/SettingsItemTextViewStyle"
+            android:text="@string/list_item_share" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/settings_item_height"
-            android:src="@drawable/settings_share"
-            android:layout_gravity="end"
-            app:tint="@color/settings_gray" />
+            style="@style/SettingsItemImageViewStyle"
+            android:src="@drawable/settings_share" />
     </FrameLayout>
 
     <FrameLayout
+        android:id="@+id/settings_write_to_support_frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/settings_item_height"
-            android:gravity="center_vertical"
-            android:text="@string/list_item_support"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="@dimen/settings_item_text_size"
-            android:layout_marginStart="@dimen/settings_item_margin" />
+            style="@style/SettingsItemTextViewStyle"
+            android:text="@string/list_item_support" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/settings_item_height"
-            android:src="@drawable/settings_support"
-            android:layout_gravity="end"
-            app:tint="@color/settings_gray" />
+            style="@style/SettingsItemImageViewStyle"
+            android:src="@drawable/settings_support" />
     </FrameLayout>
 
     <FrameLayout
+        android:id="@+id/settings_user_agreement_frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/settings_item_height"
-            android:gravity="center_vertical"
-            android:text="@string/list_item_license"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="@dimen/settings_item_text_size"
-            android:layout_marginStart="@dimen/settings_item_margin" />
+            style="@style/SettingsItemTextViewStyle"
+            android:text="@string/list_item_license" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/settings_item_height"
-            android:layout_gravity="end"
-            android:src="@drawable/settings_list_arrow"
-            app:tint="@color/settings_gray" />
+            style="@style/SettingsItemImageViewStyle"
+            android:src="@drawable/settings_list_arrow" />
     </FrameLayout>
 
 </LinearLayout>

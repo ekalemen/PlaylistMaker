@@ -9,4 +9,9 @@
     <string name="list_item_license">Пользовательское соглашение</string>
     <string name="media_text">Медиатека</string>
     <string name="search_text">Поиск</string>
+    <string name="support_share_url">https://practicum.yandex.ru/android-developer/</string>
+    <string name="support_email">kalemenev@gmail.com</string>
+    <string name="support_mail_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="support_mail_body">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="support_user_agreement_url">https://yandex.ru/legal/practicum_offer</string>
 </resources>
