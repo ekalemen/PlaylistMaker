@@ -29,7 +29,6 @@ class SettingsActivity : AppCompatActivity() {
             shareIntent.putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.support_share_url))
             shareIntent.setType("text/plain")
             startActivity(Intent.createChooser(shareIntent,"Share link"))
-            //Toast.makeText(this, "Нажали на фрейм Поделиться приложением", Toast.LENGTH_SHORT).show()
         }
 
         val writeToSupportFrame = findViewById<FrameLayout>(R.id.settings_write_to_support_frame)
@@ -41,7 +40,6 @@ class SettingsActivity : AppCompatActivity() {
             supportIntent.putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.support_mail_body))
             supportIntent.putExtra(Intent.EXTRA_SUBJECT, resources.getString(R.string.support_mail_subject))
             startActivity(supportIntent)
-            //Toast.makeText(this, "Нажали на фрейм Write to support", Toast.LENGTH_SHORT).show()
         }
 
         val userAgreementFrame = findViewById<FrameLayout>(R.id.settings_user_agreement_frame)
@@ -50,7 +48,6 @@ class SettingsActivity : AppCompatActivity() {
             val userAgreementIntent = Intent(Intent.ACTION_VIEW)
             userAgreementIntent.setData(Uri.parse(resources.getString(R.string.support_user_agreement_url)))
             startActivity(userAgreementIntent)
-            //Toast.makeText(this, "Нажали на фрейм User Agreement", Toast.LENGTH_SHORT).show()
         }
     }
 }

@@ -10,11 +10,29 @@ import android.view.View
 import android.widget.EditText
 
 class SearchActivity : AppCompatActivity() {
+    var inputText: String = AMOUNT_DEF
+
+    companion object {
+        const val TEXT_AMOUNT = "TEXT_AMOUNT"
+        const val AMOUNT_DEF = ""
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(TEXT_AMOUNT, inputText)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        inputText = savedInstanceState.getString(TEXT_AMOUNT, AMOUNT_DEF)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         val searchEditText = findViewById<EditText>(R.id.searchEditText)
+
+        searchEditText.setText(inputText)
 
         @SuppressLint("ClickableViewAccessibility")
         fun EditText.onRightDrawableClicked(onClicked: (view: EditText) -> Unit) {
