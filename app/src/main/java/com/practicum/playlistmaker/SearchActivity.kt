@@ -5,9 +5,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 
 class SearchActivity : AppCompatActivity() {
     var inputText: String = AMOUNT_DEF
@@ -29,6 +35,10 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        val recyclerView = findViewById<RecyclerView>(R.id.tracksRecyclerView)
+        val trackAdapter = TrackAdapter(MockTrackList.tracks)
+        recyclerView.adapter = trackAdapter
 
         val searchEditText = findViewById<EditText>(R.id.searchEditText)
 
@@ -73,5 +83,41 @@ class SearchActivity : AppCompatActivity() {
         }
 
         searchEditText.addTextChangedListener(searchTextWatcher)
+    }
+}
+
+class TrackAdapter(
+    private val tracks: List<Track>
+) : RecyclerView.Adapter<TrackViewHolder> () {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
+        return TrackViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
+        holder.bind(tracks[position])
+    }
+
+    override fun getItemCount(): Int {
+        return tracks.size
+    }
+
+}
+class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+
+    private val artist: TextView = itemView.findViewById(R.id.foundArtistName)
+    private val trackName: TextView = itemView.findViewById(R.id.foundTrackName)
+    private val albumCover: ImageView = itemView.findViewById(R.id.albumCover)
+    private val trackTime: TextView = itemView.findViewById(R.id.foundTrackTime)
+
+    fun bind(model: Track) {
+        artist.setText(model.artistName)
+        trackName.setText(model.trackName)
+        trackTime.setText(model.trackTime)
+        Glide.with(itemView)
+            .load(model.artworkUrl100)
+            .placeholder(R.drawable.ic_track_placeholder)
+            .into(albumCover)
     }
 }
