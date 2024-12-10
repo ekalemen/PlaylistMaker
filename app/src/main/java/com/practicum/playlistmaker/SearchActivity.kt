@@ -1,6 +1,8 @@
 package com.practicum.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -9,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -44,6 +47,14 @@ class SearchActivity : AppCompatActivity() {
 
         searchEditText.setText(inputText)
 
+        val buttonSearchBack = findViewById<ImageView>(R.id.srch_button_back)
+
+        buttonSearchBack.setOnClickListener {
+            val setBackToMainIntent = Intent(this, MainActivity::class.java)
+            finish()
+            startActivity(setBackToMainIntent)
+        }
+
         @SuppressLint("ClickableViewAccessibility")
         fun EditText.onRightDrawableClicked(onClicked: (view: EditText) -> Unit) {
             this.setOnTouchListener { v, event ->
@@ -61,6 +72,8 @@ class SearchActivity : AppCompatActivity() {
         }
 
         searchEditText.onRightDrawableClicked {
+            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            inputMethodManager?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
             it.text.clear()
         }
 

@@ -101,6 +101,7 @@
         <item name = "android:paddingStart">8dp</item>
         <item name = "android:paddingEnd">8dp</item>
         <item name = "android:drawablePadding">4dp</item>
+        <item name = "android:drawableTint">@color/search_gray</item>
         <item name = "android:background">@drawable/rounded_search_edittext</item>
         <item name = "android:backgroundTint">@color/settings_sw_track_gray</item>
     </style>
