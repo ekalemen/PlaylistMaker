@@ -10,11 +10,12 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginBottom="24dp">
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp">
 
         <ImageView
             style="@style/SettingsTopHeaderImageView"
-            android:id="@+id/settings_button_back"
+            android:id="@+id/srch_button_back"
             android:src="@drawable/settings_arrow_back" />
 
         <TextView
