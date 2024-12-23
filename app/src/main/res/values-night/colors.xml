@@ -10,5 +10,5 @@
     <color name="settings_sw_track_gray">#E6E8EB</color>
     <color name="settings_sw_track_light_blue">#9FBBF3</color>
     <color name="search_gray">#FFAEAFB4</color>
-    <color name="place_holder_icon">@color/main_black</color>
+    <color name="place_holder_icon">@color/white</color>
 </resources>
