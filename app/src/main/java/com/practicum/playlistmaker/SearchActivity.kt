@@ -112,6 +112,9 @@ class SearchActivity : AppCompatActivity() {
             it.text.clear()
             foundTracks.clear()
             trackAdapter.updateTracksList(foundTracks)
+            placeholderImage.visibility = View.GONE
+            placeholderUpdateButton.visibility = View.GONE
+            showPlaceHolderText("")
         }
 
         val searchTextWatcher = object : TextWatcher {
@@ -126,6 +129,11 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 if(s.isNullOrEmpty()) {
                     searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.search_edit_view_icon, 0, 0, 0);
+                    foundTracks.clear()
+                    trackAdapter.updateTracksList(foundTracks)
+                    placeholderImage.visibility = View.GONE
+                    placeholderUpdateButton.visibility = View.GONE
+                    showPlaceHolderText("")
                 } else {
                     searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.search_edit_view_icon, 0, R.drawable.edit_clear, 0);
                 }
@@ -223,8 +231,8 @@ class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         artist.setText(model.artistName)
         trackName.setText(model.trackName)
         val dateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
-        val formattedTime = dateFormat.format(model.trackTime)
-        trackTime.setText(formattedTime)
+        val formattedTime = dateFormat.format(model.trackTimeMillis)
+        trackTime.text = formattedTime
         Glide.with(itemView)
             .load(model.artworkUrl100)
             .placeholder(R.drawable.ic_track_placeholder)
