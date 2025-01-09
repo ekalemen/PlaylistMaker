@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/SettingsLinLayoutStyle"
+    style="@style/SearchLinLayoutStyle"
     tools:context=".SearchActivity">
 
     <LinearLayout
@@ -40,39 +40,60 @@
             tools:ignore="RtlSymmetry" />
     </LinearLayout>
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tracksRecyclerView"
+        <TextView
+            android:id="@+id/search_history_header"
+            style="@style/PlaceHolderTextStyle"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/search_history_header"
+            android:visibility="gone" />
+
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+            android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="86dp"
-            android:orientation="vertical">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tracksRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
-            <ImageView
-                android:id="@+id/placeholderImage"
-                style="@style/PlaceHolderImageStyle"
-                android:visibility="gone" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="86dp"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/placeholderMessage"
-                style="@style/PlaceHolderTextStyle"
-                tools:text="@string/something_went_wrong" />
+                <ImageView
+                    android:id="@+id/placeholderImage"
+                    style="@style/PlaceHolderImageStyle"
+                    android:visibility="gone" />
 
-            <Button
-                android:id="@+id/placeholderUpdateButton"
-                style="@style/PlaceHolderButtonStyle"
-                android:text="@string/update_connection"
-                android:visibility="gone"
-                app:cornerRadius="54dp" />
-        </LinearLayout>
-    </FrameLayout>
+                <TextView
+                    android:id="@+id/placeholderMessage"
+                    style="@style/PlaceHolderTextStyle"
+                    tools:text="@string/something_went_wrong" />
+
+                <Button
+                    android:id="@+id/placeholderUpdateButton"
+                    style="@style/PlaceHolderButtonStyle"
+                    android:text="@string/update_connection"
+                    android:visibility="gone"
+                    app:cornerRadius="54dp" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/clear_history_button"
+            style="@style/PlaceHolderButtonStyle"
+            android:text="@string/clear_history_button"
+            android:visibility="gone"
+            app:cornerRadius="54dp"/>
+    </LinearLayout>
 </LinearLayout>

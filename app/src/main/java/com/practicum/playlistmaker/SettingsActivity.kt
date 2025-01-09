@@ -7,7 +7,10 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.Switch
 import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +51,14 @@ class SettingsActivity : AppCompatActivity() {
             val userAgreementIntent = Intent(Intent.ACTION_VIEW)
             userAgreementIntent.setData(Uri.parse(resources.getString(R.string.support_user_agreement_url)))
             startActivity(userAgreementIntent)
+        }
+
+        val themeSwitcher = findViewById<Switch>(R.id.theme_switcher)
+
+        themeSwitcher.isChecked = (applicationContext as App).darkTheme
+
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
         }
     }
 }
