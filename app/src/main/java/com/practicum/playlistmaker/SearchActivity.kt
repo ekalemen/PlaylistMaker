@@ -3,6 +3,7 @@ package com.practicum.playlistmaker
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -33,6 +34,12 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderMessage: TextView
     private lateinit var placeholderImage: ImageView
     private lateinit var placeholderUpdateButton: Button
+    private lateinit var searchHistoryHeader: TextView
+    private lateinit var searchHistoryClearButton: Button
+    private lateinit var sharedPrefs: SharedPreferences
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var recyclerView: RecyclerView
+
     private val baseUrl = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
@@ -40,7 +47,9 @@ class SearchActivity : AppCompatActivity() {
             .build()
     private val iTunesService = retrofit.create(ITunesAPI::class.java)
     private var foundTracks = ArrayList<Track>()
-    private val trackAdapter = TrackAdapter()
+
+    private val searchTrackAdapter = TrackAdapter { searchHistory.addTrackToHistory(it) }
+    private var historyTrackAdapter = TrackAdapter {}
 
     companion object {
         const val TEXT_AMOUNT = "TEXT_AMOUNT"
@@ -60,8 +69,12 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val recyclerView = findViewById<RecyclerView>(R.id.tracksRecyclerView)
-        recyclerView.adapter = trackAdapter
+        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFS, MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPrefs)
+        searchHistory.getSavedHistory()
+
+        recyclerView = findViewById<RecyclerView>(R.id.tracksRecyclerView)
+        recyclerView.adapter = searchTrackAdapter
 
         searchEditText = findViewById<EditText>(R.id.searchEditText)
         searchEditText.setText(inputText)
@@ -69,6 +82,9 @@ class SearchActivity : AppCompatActivity() {
         placeholderMessage = findViewById(R.id.placeholderMessage)
         placeholderImage = findViewById(R.id.placeholderImage)
         placeholderUpdateButton = findViewById(R.id.placeholderUpdateButton)
+
+        searchHistoryHeader = findViewById(R.id.search_history_header)
+        searchHistoryClearButton = findViewById(R.id.clear_history_button)
 
         val buttonSearchBack = findViewById<ImageView>(R.id.srch_button_back)
 
@@ -78,12 +94,24 @@ class SearchActivity : AppCompatActivity() {
             startActivity(setBackToMainIntent)
         }
 
+        searchHistoryClearButton.setOnClickListener {
+            searchHistory.clearTrackHistory()
+            historyTrackAdapter.updateTracksList(searchHistory.getHistoryTracks())
+            setHistoryVisibility(false)
+        }
+
         searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 search()
                 true
             }
             false
+        }
+
+        searchEditText.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus && searchHistory.getHistoryTracks().isNotEmpty()) {
+                setHistoryVisibility(hasFocus)
+            }
         }
 
         placeholderUpdateButton.setOnClickListener {
@@ -111,7 +139,7 @@ class SearchActivity : AppCompatActivity() {
             inputMethodManager?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
             it.text.clear()
             foundTracks.clear()
-            trackAdapter.updateTracksList(foundTracks)
+            searchTrackAdapter.updateTracksList(foundTracks)
             placeholderImage.visibility = View.GONE
             placeholderUpdateButton.visibility = View.GONE
             showPlaceHolderText("")
@@ -123,14 +151,14 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
+                setHistoryVisibility(searchEditText.hasFocus() && s?.isEmpty() == true)
             }
 
             override fun afterTextChanged(s: Editable?) {
                 if(s.isNullOrEmpty()) {
                     searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.search_edit_view_icon, 0, 0, 0);
                     foundTracks.clear()
-                    trackAdapter.updateTracksList(foundTracks)
+                    searchTrackAdapter.updateTracksList(foundTracks)
                     placeholderImage.visibility = View.GONE
                     placeholderUpdateButton.visibility = View.GONE
                     showPlaceHolderText("")
@@ -141,6 +169,11 @@ class SearchActivity : AppCompatActivity() {
         }
 
         searchEditText.addTextChangedListener(searchTextWatcher)
+    }
+
+    override fun onPause() {
+        searchHistory.saveTrackHistory()
+        super.onPause()
     }
 
     private fun search() {
@@ -154,8 +187,7 @@ class SearchActivity : AppCompatActivity() {
                                 placeholderImage.visibility = View.GONE
                                 placeholderUpdateButton.visibility = View.GONE
                                 foundTracks.addAll(response.body()?.results!!)
-
-                                trackAdapter.updateTracksList(foundTracks)
+                                searchTrackAdapter.updateTracksList(foundTracks)
                             }
                             if (foundTracks.isEmpty()) {
                                 placeholderImage.setImageResource(R.drawable.ic_search_error)
@@ -185,11 +217,25 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    fun setHistoryVisibility(isSearchFieldEmpty: Boolean) {
+        if (isSearchFieldEmpty) {
+            searchHistoryHeader.visibility = View.VISIBLE
+            searchHistoryClearButton.visibility = View.VISIBLE
+            historyTrackAdapter.updateTracksList(searchHistory.getHistoryTracks())
+            recyclerView.adapter = historyTrackAdapter
+        } else {
+            searchHistoryHeader.visibility = View.GONE
+            searchHistoryClearButton.visibility = View.GONE
+            historyTrackAdapter.updateTracksList(mutableListOf<Track>())
+            recyclerView.adapter = searchTrackAdapter
+        }
+    }
+
     private fun showPlaceHolderText(text: String) {
         if (text.isNotEmpty()) {
             placeholderMessage.visibility = View.VISIBLE
             foundTracks.clear()
-            trackAdapter.updateTracksList(foundTracks)
+            searchTrackAdapter.updateTracksList(foundTracks)
             placeholderMessage.text = text
         } else {
             placeholderMessage.visibility = View.GONE
@@ -197,10 +243,12 @@ class SearchActivity : AppCompatActivity() {
     }
 }
 
-class TrackAdapter : RecyclerView.Adapter<TrackViewHolder> () {
-    private var tracks: ArrayList<Track> = ArrayList()
+class TrackAdapter(
+    private val onItemClickListener: (Track) -> Unit
+) : RecyclerView.Adapter<TrackViewHolder> () {
+    private var tracks = mutableListOf<Track>()
 
-    fun updateTracksList(newTracks: ArrayList<Track>) {
+    fun updateTracksList(newTracks: MutableList<Track>) {
         tracks.clear()
         tracks.addAll(newTracks)
         notifyDataSetChanged()
@@ -213,12 +261,14 @@ class TrackAdapter : RecyclerView.Adapter<TrackViewHolder> () {
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
+        holder.itemView.setOnClickListener {
+            onItemClickListener(tracks[position])
+        }
     }
 
     override fun getItemCount(): Int {
         return tracks.size
     }
-
 }
 class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 

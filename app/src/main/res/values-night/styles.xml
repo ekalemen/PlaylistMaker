@@ -88,6 +88,12 @@
         <item name = "android:layout_height">@dimen/settings_item_height</item>
         <item name = "android:layout_gravity">end</item>
     </style>
+    <style name="SearchLinLayoutStyle">
+        <item name = "android:layout_width">match_parent</item>"
+        <item name = "android:layout_height">match_parent</item>
+        <item name = "android:orientation">vertical</item>
+        <item name = "android:background">@color/main_black</item>
+    </style>
     <style name="SearchEditViewStyle">
         <item name = "android:layout_width">0dp</item>
         <item name = "android:layout_height">36dp</item>

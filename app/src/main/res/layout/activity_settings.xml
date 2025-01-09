@@ -33,6 +33,7 @@
 
         <Switch
             style="@style/SettingsThemeSwitchStyle"
+            android:id="@+id/theme_switcher"
             android:switchMinWidth="32dp"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
     </FrameLayout>
