@@ -20,6 +20,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,6 +29,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+const val EXTRA_TRACK_INFO = "EXTRA_TRACK_INFO"
 class SearchActivity : AppCompatActivity() {
     var inputText: String = AMOUNT_DEF
     private lateinit var searchEditText: EditText
@@ -48,8 +50,8 @@ class SearchActivity : AppCompatActivity() {
     private val iTunesService = retrofit.create(ITunesAPI::class.java)
     private var foundTracks = ArrayList<Track>()
 
-    private val searchTrackAdapter = TrackAdapter { searchHistory.addTrackToHistory(it) }
-    private var historyTrackAdapter = TrackAdapter {}
+    private val searchTrackAdapter = TrackAdapter { playTrack(it) }
+    private var historyTrackAdapter = TrackAdapter { playTrack(it) }
 
     companion object {
         const val TEXT_AMOUNT = "TEXT_AMOUNT"
@@ -215,6 +217,15 @@ class SearchActivity : AppCompatActivity() {
                     }
                 })
         }
+    }
+
+    fun playTrack(track: Track) {
+        searchHistory.addTrackToHistory(track)
+        val gson = Gson()
+        val trackStr = gson.toJson(track)
+        val intent = Intent(this, PlayerActivity::class.java)
+        intent.putExtra(EXTRA_TRACK_INFO,trackStr)
+        startActivity(intent)
     }
 
     fun setHistoryVisibility(isSearchFieldEmpty: Boolean) {
