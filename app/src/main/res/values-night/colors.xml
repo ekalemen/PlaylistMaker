@@ -13,5 +13,5 @@
     <color name="place_holder_icon">@color/white</color>
     <color name="player_buttons_color">@color/white</color>
     <color name="player_track_info_color">@color/white</color>
-    <color name="player_buttons_color2">@color/settings_gray</color>
+    <color name="player_buttons_color2">@color/white</color>
 </resources>
