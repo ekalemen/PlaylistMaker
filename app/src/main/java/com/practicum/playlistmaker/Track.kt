@@ -9,7 +9,8 @@ data class Track(
     val collectionName: String,  // Альбом
     val releaseDate: String,     // Год выхода
     val primaryGenreName: String,// Жанр
-    val country: String          // Страна
+    val country: String,          // Страна
+    val previewUrl: String,      // 30 seconds audio preview
 ) {
     fun getCoverArtwork() = artworkUrl100?.replaceAfterLast('/',"512x512bb.jpg")
 }
