@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -17,6 +19,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -41,6 +44,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var searchHistory: SearchHistory
     private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
 
     private val baseUrl = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
@@ -53,9 +57,14 @@ class SearchActivity : AppCompatActivity() {
     private val searchTrackAdapter = TrackAdapter { playTrack(it) }
     private var historyTrackAdapter = TrackAdapter { playTrack(it) }
 
+    private val handler = Handler(Looper.getMainLooper())
+    private var isClickAllowed = true
+
     companion object {
-        const val TEXT_AMOUNT = "TEXT_AMOUNT"
-        const val AMOUNT_DEF = ""
+        private const val TEXT_AMOUNT = "TEXT_AMOUNT"
+        private const val AMOUNT_DEF = ""
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -70,6 +79,8 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        progressBar = findViewById(R.id.progressBar)
 
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFS, MODE_PRIVATE)
         searchHistory = SearchHistory(sharedPrefs)
@@ -153,6 +164,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                searchDebounce()
                 setHistoryVisibility(searchEditText.hasFocus() && s?.isEmpty() == true)
             }
 
@@ -178,11 +190,29 @@ class SearchActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
+    private val searchRunnable = Runnable { search() }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
     private fun search() {
         if (searchEditText.text.isNotEmpty()) {
+            progressBar.visibility = View.VISIBLE
             iTunesService.search(searchEditText.text.toString()).enqueue(object : Callback<ITunesResponse> {
                     @SuppressLint("NotifyDataSetChanged")
                     override fun onResponse(call: Call<ITunesResponse>, response: Response<ITunesResponse>) {
+                        progressBar.visibility = View.GONE
                         if (response.code() == 200) {
                             foundTracks.clear()
                             if (response.body()?.results?.isNotEmpty() == true) {
@@ -210,6 +240,7 @@ class SearchActivity : AppCompatActivity() {
                     }
 
                     override fun onFailure(call: Call<ITunesResponse>, t: Throwable) {
+                        progressBar.visibility = View.GONE
                         placeholderImage.setImageResource(R.drawable.ic_server_error)
                         placeholderImage.visibility = View.VISIBLE
                         placeholderUpdateButton.visibility = View.VISIBLE

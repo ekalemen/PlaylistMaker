@@ -14,4 +14,5 @@
     <color name="player_buttons_color">@color/main_black</color>
     <color name="player_track_info_color">@color/main_black</color>
     <color name="player_buttons_color2">@color/main_black</color>
+    <color name="progress_bar_color">#3772E7</color>
 </resources>
