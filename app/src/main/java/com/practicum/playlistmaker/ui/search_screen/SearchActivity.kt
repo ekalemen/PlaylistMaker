@@ -1,19 +1,16 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.search_screen
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -22,15 +19,15 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.google.gson.Gson
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.domain.api.SearchHistoryInteractor
+import com.practicum.playlistmaker.domain.api.TracksInteractor
+import com.practicum.playlistmaker.domain.models.SearchTracksResult
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.ui.main_screen.MainActivity
+import com.practicum.playlistmaker.ui.player_screen.PlayerActivity
 
 const val EXTRA_TRACK_INFO = "EXTRA_TRACK_INFO"
 class SearchActivity : AppCompatActivity() {
@@ -41,17 +38,9 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderUpdateButton: Button
     private lateinit var searchHistoryHeader: TextView
     private lateinit var searchHistoryClearButton: Button
-    private lateinit var sharedPrefs: SharedPreferences
-    private lateinit var searchHistory: SearchHistory
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
 
-    private val baseUrl = "https://itunes.apple.com"
-    private val retrofit = Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    private val iTunesService = retrofit.create(ITunesAPI::class.java)
     private var foundTracks = ArrayList<Track>()
 
     private val searchTrackAdapter = TrackAdapter { playTrack(it) }
@@ -60,6 +49,8 @@ class SearchActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
 
+    private lateinit var searchTrackInteractor: TracksInteractor
+    private lateinit var searchHistoryInteractor: SearchHistoryInteractor
     companion object {
         private const val TEXT_AMOUNT = "TEXT_AMOUNT"
         private const val AMOUNT_DEF = ""
@@ -80,11 +71,11 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        progressBar = findViewById(R.id.progressBar)
+        searchTrackInteractor = Creator.provideTracksInteractor()
+        searchHistoryInteractor = Creator.provideSearchHistoryInteractor(this)
+        searchHistoryInteractor.getSavedHistory()
 
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFS, MODE_PRIVATE)
-        searchHistory = SearchHistory(sharedPrefs)
-        searchHistory.getSavedHistory()
+        progressBar = findViewById(R.id.progressBar)
 
         recyclerView = findViewById<RecyclerView>(R.id.tracksRecyclerView)
         recyclerView.adapter = searchTrackAdapter
@@ -108,8 +99,8 @@ class SearchActivity : AppCompatActivity() {
         }
 
         searchHistoryClearButton.setOnClickListener {
-            searchHistory.clearTrackHistory()
-            historyTrackAdapter.updateTracksList(searchHistory.getHistoryTracks())
+            searchHistoryInteractor.clearTrackHistory()
+            historyTrackAdapter.updateTracksList(searchHistoryInteractor.getHistoryTracks())
             setHistoryVisibility(false)
         }
 
@@ -122,7 +113,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         searchEditText.setOnFocusChangeListener { view, hasFocus ->
-            if (hasFocus && searchHistory.getHistoryTracks().isNotEmpty()) {
+            if (hasFocus && searchHistoryInteractor.getHistoryTracks().isNotEmpty()) {
                 setHistoryVisibility(hasFocus)
             }
         }
@@ -177,7 +168,9 @@ class SearchActivity : AppCompatActivity() {
                     placeholderUpdateButton.visibility = View.GONE
                     showPlaceHolderText("")
                 } else {
-                    searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.search_edit_view_icon, 0, R.drawable.edit_clear, 0);
+                    searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        R.drawable.search_edit_view_icon, 0,
+                        R.drawable.edit_clear, 0);
                 }
             }
         }
@@ -186,7 +179,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        searchHistory.saveTrackHistory()
+        searchHistoryInteractor.saveTrackHistory()
         super.onPause()
     }
 
@@ -209,49 +202,47 @@ class SearchActivity : AppCompatActivity() {
     private fun search() {
         if (searchEditText.text.isNotEmpty()) {
             progressBar.visibility = View.VISIBLE
-            iTunesService.search(searchEditText.text.toString()).enqueue(object : Callback<ITunesResponse> {
+            searchTrackInteractor.searchTracks(
+                searchEditText.text.toString(),
+                object : TracksInteractor.TracksConsumer {
                     @SuppressLint("NotifyDataSetChanged")
-                    override fun onResponse(call: Call<ITunesResponse>, response: Response<ITunesResponse>) {
-                        progressBar.visibility = View.GONE
-                        if (response.code() == 200) {
-                            foundTracks.clear()
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                placeholderImage.visibility = View.GONE
-                                placeholderUpdateButton.visibility = View.GONE
-                                foundTracks.addAll(response.body()?.results!!)
-                                searchTrackAdapter.updateTracksList(foundTracks)
-                            }
-                            if (foundTracks.isEmpty()) {
-                                placeholderImage.setImageResource(R.drawable.ic_search_error)
-                                placeholderImage.visibility = View.VISIBLE
-                                placeholderUpdateButton.visibility = View.GONE
-                                showPlaceHolderText(getString(R.string.found_nothing))
+                    override fun consume(searchRes: SearchTracksResult) {
+                        runOnUiThread {
+                            progressBar.visibility = View.GONE
+                            if (searchRes.resultCode == 200) {
+                                foundTracks.clear()
+                                if (searchRes.tracks.isNotEmpty() == true) {
+                                    placeholderImage.visibility = View.GONE
+                                    placeholderUpdateButton.visibility = View.GONE
+                                    foundTracks.addAll(searchRes.tracks)
+                                    searchTrackAdapter.updateTracksList(foundTracks)
+                                    searchTrackAdapter.notifyDataSetChanged()
+                                }
+                                if (foundTracks.isEmpty()) {
+                                    placeholderImage.setImageResource(R.drawable.ic_search_error)
+                                    placeholderImage.visibility = View.VISIBLE
+                                    placeholderUpdateButton.visibility = View.GONE
+                                    showPlaceHolderText(getString(R.string.found_nothing))
+                                } else {
+                                    placeholderImage.visibility = View.GONE
+                                    placeholderUpdateButton.visibility = View.GONE
+                                    showPlaceHolderText("")
+                                }
                             } else {
-                                placeholderImage.visibility = View.GONE
-                                placeholderUpdateButton.visibility = View.GONE
-                                showPlaceHolderText("")
+                                placeholderImage.setImageResource(R.drawable.ic_server_error)
+                                placeholderImage.visibility = View.VISIBLE
+                                placeholderUpdateButton.visibility = View.VISIBLE
+                                showPlaceHolderText(getString(R.string.something_went_wrong))
                             }
-                        } else {
-                            placeholderImage.setImageResource(R.drawable.ic_server_error)
-                            placeholderImage.visibility = View.VISIBLE
-                            placeholderUpdateButton.visibility = View.VISIBLE
-                            showPlaceHolderText(getString(R.string.something_went_wrong))
                         }
                     }
-
-                    override fun onFailure(call: Call<ITunesResponse>, t: Throwable) {
-                        progressBar.visibility = View.GONE
-                        placeholderImage.setImageResource(R.drawable.ic_server_error)
-                        placeholderImage.visibility = View.VISIBLE
-                        placeholderUpdateButton.visibility = View.VISIBLE
-                        showPlaceHolderText(getString(R.string.something_went_wrong))
-                    }
-                })
+                }
+            )
         }
     }
 
     fun playTrack(track: Track) {
-        searchHistory.addTrackToHistory(track)
+        searchHistoryInteractor.addTrackToHistory(track)
         val gson = Gson()
         val trackStr = gson.toJson(track)
         val intent = Intent(this, PlayerActivity::class.java)
@@ -263,7 +254,7 @@ class SearchActivity : AppCompatActivity() {
         if (isSearchFieldEmpty) {
             searchHistoryHeader.visibility = View.VISIBLE
             searchHistoryClearButton.visibility = View.VISIBLE
-            historyTrackAdapter.updateTracksList(searchHistory.getHistoryTracks())
+            historyTrackAdapter.updateTracksList(searchHistoryInteractor.getHistoryTracks())
             recyclerView.adapter = historyTrackAdapter
         } else {
             searchHistoryHeader.visibility = View.GONE
@@ -282,52 +273,5 @@ class SearchActivity : AppCompatActivity() {
         } else {
             placeholderMessage.visibility = View.GONE
         }
-    }
-}
-
-class TrackAdapter(
-    private val onItemClickListener: (Track) -> Unit
-) : RecyclerView.Adapter<TrackViewHolder> () {
-    private var tracks = mutableListOf<Track>()
-
-    fun updateTracksList(newTracks: MutableList<Track>) {
-        tracks.clear()
-        tracks.addAll(newTracks)
-        notifyDataSetChanged()
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
-        return TrackViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(tracks[position])
-        holder.itemView.setOnClickListener {
-            onItemClickListener(tracks[position])
-        }
-    }
-
-    override fun getItemCount(): Int {
-        return tracks.size
-    }
-}
-class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-
-    private val artist: TextView = itemView.findViewById(R.id.foundArtistName)
-    private val trackName: TextView = itemView.findViewById(R.id.foundTrackName)
-    private val albumCover: ImageView = itemView.findViewById(R.id.albumCover)
-    private val trackTime: TextView = itemView.findViewById(R.id.foundTrackTime)
-
-    fun bind(model: Track) {
-        artist.setText(model.artistName)
-        trackName.setText(model.trackName)
-        val dateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
-        val formattedTime = dateFormat.format(model.trackTimeMillis)
-        trackTime.text = formattedTime
-        Glide.with(itemView)
-            .load(model.artworkUrl100)
-            .placeholder(R.drawable.ic_track_placeholder)
-            .into(albumCover)
     }
 }

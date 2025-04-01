@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.player_screen
 
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
@@ -11,16 +11,21 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.gson.Gson
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.domain.api.PlayerInteractor
+import com.practicum.playlistmaker.domain.api.PlayerStatus
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.ui.search_screen.EXTRA_TRACK_INFO
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var buttonPlay: ImageView
     private lateinit var trackPlayingTime: TextView
-    private var mediaPlayer = MediaPlayer()
-    private var playerState = STATE_DEFAULT
     private var previewUrl: String? = null
     private val handler = Handler(Looper.getMainLooper())
+    private lateinit var playerInteractor: PlayerInteractor
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
@@ -29,6 +34,8 @@ class PlayerActivity : AppCompatActivity() {
         val trackStr = intent.getStringExtra(EXTRA_TRACK_INFO)
         val gson = Gson()
         val track = gson.fromJson(trackStr, Track::class.java)
+
+        playerInteractor = Creator.providePlayerInteractor()
 
         val playerButtonBack = findViewById<ImageView>(R.id.player_button_back)
         playerButtonBack.setOnClickListener {
@@ -52,7 +59,7 @@ class PlayerActivity : AppCompatActivity() {
         trackArtist.text = track.artistName
 
         val durationTrackTime = findViewById<TextView>(R.id.durationTrack)
-        durationTrackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
+        durationTrackTime.text = track.trackDuration
 
         val trackAlbum = findViewById<TextView>(R.id.albumTrack)
         trackAlbum.text = track.collectionName
@@ -70,7 +77,12 @@ class PlayerActivity : AppCompatActivity() {
 
         buttonPlay = findViewById(R.id.player_button_play)
         buttonPlay.isEnabled = false
-        preparePlayer()
+
+        playerInteractor.preparePlayer(previewUrl,
+            { buttonPlay.isEnabled = true },
+            { buttonPlay.setImageResource(R.drawable.ic_play_button)
+              handler.removeCallbacks(timeUpdatingInterval)
+              trackPlayingTime.setText(R.string.track_start_time) })
 
         buttonPlay.setOnClickListener {
             playbackControl()
@@ -88,65 +100,46 @@ class PlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(timeUpdatingInterval)
-        mediaPlayer.release()
-    }
-
-    private fun preparePlayer() {
-        mediaPlayer.setDataSource(previewUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            buttonPlay.isEnabled = true
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            playerState = STATE_PREPARED
-            buttonPlay.setImageResource(R.drawable.ic_play_button)
-            handler.removeCallbacks(timeUpdatingInterval)
-            trackPlayingTime.setText(R.string.track_start_time)
-        }
+        playerInteractor.destroyPlayer()
     }
 
     private val timeUpdatingInterval = object : Runnable {
         override fun run() {
-            if (playerState == STATE_PLAYING) {
+            if (playerInteractor.getPlayerStatus() == PlayerStatus.STATE_PLAYING) {
                 trackPlayingTime.text = SimpleDateFormat("mm:ss", Locale.getDefault())
-                    .format(mediaPlayer.currentPosition)
+                    .format(playerInteractor.getPlayerPosition())
                 handler.postDelayed(this, UPDATE_TIME)
             }
         }
     }
 
     private fun startPlayer() {
-        mediaPlayer.start()
+        playerInteractor.startPlayer()
         buttonPlay.setImageResource(R.drawable.ic_pause_button)
-        playerState = STATE_PLAYING
         handler.post(timeUpdatingInterval)
     }
 
     private fun pausePlayer() {
-        mediaPlayer.pause()
+        playerInteractor.pausePlayer()
         buttonPlay.setImageResource(R.drawable.ic_play_button)
-        playerState = STATE_PAUSED
         handler.removeCallbacks(timeUpdatingInterval)
     }
 
     private fun playbackControl() {
-        when (playerState) {
-            STATE_PLAYING -> {
+        when (playerInteractor.getPlayerStatus()) {
+            PlayerStatus.STATE_PLAYING -> {
                 pausePlayer()
             }
 
-            STATE_PREPARED, STATE_PAUSED -> {
+            PlayerStatus.STATE_PREPARED, PlayerStatus.STATE_PAUSED -> {
                 startPlayer()
             }
+
+            else -> {pausePlayer()}
         }
     }
 
     companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
         private const val UPDATE_TIME = 330L
     }
 }

@@ -1,26 +1,27 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.domain.impl
 
-import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.practicum.playlistmaker.domain.api.SearchHistoryInteractor
+import com.practicum.playlistmaker.domain.api.SearchHistoryRepository
+import com.practicum.playlistmaker.domain.models.Track
 
-const val SEARCH_TRACK_HISTORY = "search_track_history"
 const val HISTORY_SIZE = 10
 
-class SearchHistory(private val pf: SharedPreferences) {
+class SearchHistoryInteractorImpl(private val shRepository: SearchHistoryRepository) : SearchHistoryInteractor {
 
     private var trackList = mutableListOf<Track>()
     private val gson = Gson()
 
-    fun getSavedHistory(): MutableList<Track> {
-        val str = pf.getString(SEARCH_TRACK_HISTORY, null)
-        if (str != null) {
+    override fun getSavedHistory(): MutableList<Track> {
+        val str = shRepository.loadTrackHistory()
+        if (str.isNotEmpty()) {
             trackList = mutableListOf<Track>().apply {
                 addAll( gson.fromJson(str,Array<Track>::class.java ))}
         }
         return trackList
     }
 
-    fun addTrackToHistory(track: Track) {
+    override fun addTrackToHistory(track: Track) {
         if (getIndexOfTrack(track.trackId) != null)
             trackList.remove(track)
         else if (trackList.size >= HISTORY_SIZE)
@@ -29,21 +30,17 @@ class SearchHistory(private val pf: SharedPreferences) {
         saveTrackHistory()
     }
 
-    fun clearTrackHistory() {
+    override fun clearTrackHistory() {
         trackList.clear()
-        pf.edit()
-            .remove(SEARCH_TRACK_HISTORY)
-            .apply()
+        shRepository.clearTrackHistory()
     }
 
-    fun saveTrackHistory() {
+    override fun saveTrackHistory() {
         val str = gson.toJson(trackList)
-        pf.edit()
-            .putString(SEARCH_TRACK_HISTORY, str)
-            .apply()
+        shRepository.saveTrackHistory(str)
     }
 
-    fun getHistoryTracks(): MutableList<Track>{
+    override fun getHistoryTracks(): MutableList<Track>{
         return trackList
     }
 

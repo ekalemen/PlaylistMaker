@@ -1,21 +1,27 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.settings_screen
 
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Switch
-import android.widget.Toast
-import androidx.appcompat.widget.SwitchCompat
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.practicum.playlistmaker.App
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.domain.api.ThemeSwitcherInteractor
+import com.practicum.playlistmaker.domain.models.PlayListTheme
+import com.practicum.playlistmaker.domain.models.ThemeType
+import com.practicum.playlistmaker.ui.main_screen.MainActivity
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var themeSwitcherInteractor: ThemeSwitcherInteractor
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+
+        themeSwitcherInteractor = Creator.provideThemeSwitcherInteractor(this)
 
         val buttonSettingsBack = findViewById<ImageView>(R.id.settings_button_back)
 
@@ -55,10 +61,17 @@ class SettingsActivity : AppCompatActivity() {
 
         val themeSwitcher = findViewById<Switch>(R.id.theme_switcher)
 
-        themeSwitcher.isChecked = (applicationContext as App).darkTheme
+        themeSwitcher.isChecked = when(themeSwitcherInteractor.getSavedTheme()?.theme) {
+            ThemeType.DARK -> true
+            ThemeType.LIGHT -> false
+            null -> false
+        }
 
         themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
-            (applicationContext as App).switchTheme(checked)
+            if (themeSwitcher.isChecked)
+                themeSwitcherInteractor.switchTheme(PlayListTheme(ThemeType.DARK))
+            else
+                themeSwitcherInteractor.switchTheme(PlayListTheme(ThemeType.LIGHT))
         }
     }
 }

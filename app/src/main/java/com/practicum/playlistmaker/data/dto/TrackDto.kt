@@ -1,6 +1,6 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.data.dto
 
-data class Track(
+data class TrackDto (
     val trackId: Int,            // Track ID
     val trackName: String,       // Название композиции
     val artistName: String,      // Имя исполнителя
@@ -11,6 +11,4 @@ data class Track(
     val primaryGenreName: String,// Жанр
     val country: String,          // Страна
     val previewUrl: String,      // 30 seconds audio preview
-) {
-    fun getCoverArtwork() = artworkUrl100?.replaceAfterLast('/',"512x512bb.jpg")
-}
+)
