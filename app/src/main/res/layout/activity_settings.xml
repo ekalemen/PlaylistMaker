@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/SettingsLinLayoutStyle"
-    tools:context=".SettingsActivity">
+    tools:context=".ui.settings_screen.SettingsActivity">
 
     <LinearLayout
         android:orientation="horizontal"
