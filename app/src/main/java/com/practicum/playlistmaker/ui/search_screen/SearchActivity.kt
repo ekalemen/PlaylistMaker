@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.domain.api.SearchHistoryInteractor
 import com.practicum.playlistmaker.domain.api.TracksInteractor
 import com.practicum.playlistmaker.domain.models.SearchTracksResult
@@ -32,14 +33,7 @@ import com.practicum.playlistmaker.ui.player_screen.PlayerActivity
 const val EXTRA_TRACK_INFO = "EXTRA_TRACK_INFO"
 class SearchActivity : AppCompatActivity() {
     var inputText: String = AMOUNT_DEF
-    private lateinit var searchEditText: EditText
-    private lateinit var placeholderMessage: TextView
-    private lateinit var placeholderImage: ImageView
-    private lateinit var placeholderUpdateButton: Button
-    private lateinit var searchHistoryHeader: TextView
-    private lateinit var searchHistoryClearButton: Button
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
+    private lateinit var binding: ActivitySearchBinding
 
     private var foundTracks = ArrayList<Track>()
 
@@ -69,42 +63,29 @@ class SearchActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         searchTrackInteractor = Creator.provideTracksInteractor()
         searchHistoryInteractor = Creator.provideSearchHistoryInteractor(this)
         searchHistoryInteractor.getSavedHistory()
 
-        progressBar = findViewById(R.id.progressBar)
+        binding.tracksRecyclerView.adapter = searchTrackAdapter
+        binding.searchEditText.setText(inputText)
 
-        recyclerView = findViewById<RecyclerView>(R.id.tracksRecyclerView)
-        recyclerView.adapter = searchTrackAdapter
-
-        searchEditText = findViewById<EditText>(R.id.searchEditText)
-        searchEditText.setText(inputText)
-
-        placeholderMessage = findViewById(R.id.placeholderMessage)
-        placeholderImage = findViewById(R.id.placeholderImage)
-        placeholderUpdateButton = findViewById(R.id.placeholderUpdateButton)
-
-        searchHistoryHeader = findViewById(R.id.search_history_header)
-        searchHistoryClearButton = findViewById(R.id.clear_history_button)
-
-        val buttonSearchBack = findViewById<ImageView>(R.id.srch_button_back)
-
-        buttonSearchBack.setOnClickListener {
+        binding.srchButtonBack.setOnClickListener {
             val setBackToMainIntent = Intent(this, MainActivity::class.java)
             finish()
             startActivity(setBackToMainIntent)
         }
 
-        searchHistoryClearButton.setOnClickListener {
+        binding.clearHistoryButton.setOnClickListener {
             searchHistoryInteractor.clearTrackHistory()
             historyTrackAdapter.updateTracksList(searchHistoryInteractor.getHistoryTracks())
             setHistoryVisibility(false)
         }
 
-        searchEditText.setOnEditorActionListener { _, actionId, _ ->
+        binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 search()
                 true
@@ -112,13 +93,13 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
-        searchEditText.setOnFocusChangeListener { view, hasFocus ->
+        binding.searchEditText.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus && searchHistoryInteractor.getHistoryTracks().isNotEmpty()) {
                 setHistoryVisibility(hasFocus)
             }
         }
 
-        placeholderUpdateButton.setOnClickListener {
+        binding.placeholderUpdateButton.setOnClickListener {
             search()
         }
 
@@ -138,44 +119,44 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        searchEditText.onRightDrawableClicked {
+        binding.searchEditText.onRightDrawableClicked {
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            inputMethodManager?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+            inputMethodManager?.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
             it.text.clear()
             foundTracks.clear()
             searchTrackAdapter.updateTracksList(foundTracks)
-            placeholderImage.visibility = View.GONE
-            placeholderUpdateButton.visibility = View.GONE
+            binding.placeholderImage.visibility = View.GONE
+            binding.placeholderUpdateButton.visibility = View.GONE
             showPlaceHolderText("")
         }
 
         val searchTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.search_edit_view_icon, 0, 0, 0);
+                binding.searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.search_edit_view_icon, 0, 0, 0);
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 searchDebounce()
-                setHistoryVisibility(searchEditText.hasFocus() && s?.isEmpty() == true)
+                setHistoryVisibility(binding.searchEditText.hasFocus() && s?.isEmpty() == true)
             }
 
             override fun afterTextChanged(s: Editable?) {
                 if(s.isNullOrEmpty()) {
-                    searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.search_edit_view_icon, 0, 0, 0);
+                    binding.searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.search_edit_view_icon, 0, 0, 0);
                     foundTracks.clear()
                     searchTrackAdapter.updateTracksList(foundTracks)
-                    placeholderImage.visibility = View.GONE
-                    placeholderUpdateButton.visibility = View.GONE
+                    binding.placeholderImage.visibility = View.GONE
+                    binding.placeholderUpdateButton.visibility = View.GONE
                     showPlaceHolderText("")
                 } else {
-                    searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    binding.searchEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
                         R.drawable.search_edit_view_icon, 0,
                         R.drawable.edit_clear, 0);
                 }
             }
         }
 
-        searchEditText.addTextChangedListener(searchTextWatcher)
+        binding.searchEditText.addTextChangedListener(searchTextWatcher)
     }
 
     override fun onPause() {
@@ -200,38 +181,38 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun search() {
-        if (searchEditText.text.isNotEmpty()) {
-            progressBar.visibility = View.VISIBLE
+        if (binding.searchEditText.text.isNotEmpty()) {
+            binding.progressBar.visibility = View.VISIBLE
             searchTrackInteractor.searchTracks(
-                searchEditText.text.toString(),
+                binding.searchEditText.text.toString(),
                 object : TracksInteractor.TracksConsumer {
                     @SuppressLint("NotifyDataSetChanged")
                     override fun consume(searchRes: SearchTracksResult) {
                         runOnUiThread {
-                            progressBar.visibility = View.GONE
+                            binding.progressBar.visibility = View.GONE
                             if (searchRes.resultCode == 200) {
                                 foundTracks.clear()
                                 if (searchRes.tracks.isNotEmpty() == true) {
-                                    placeholderImage.visibility = View.GONE
-                                    placeholderUpdateButton.visibility = View.GONE
+                                    binding.placeholderImage.visibility = View.GONE
+                                    binding.placeholderUpdateButton.visibility = View.GONE
                                     foundTracks.addAll(searchRes.tracks)
                                     searchTrackAdapter.updateTracksList(foundTracks)
                                     searchTrackAdapter.notifyDataSetChanged()
                                 }
                                 if (foundTracks.isEmpty()) {
-                                    placeholderImage.setImageResource(R.drawable.ic_search_error)
-                                    placeholderImage.visibility = View.VISIBLE
-                                    placeholderUpdateButton.visibility = View.GONE
+                                    binding.placeholderImage.setImageResource(R.drawable.ic_search_error)
+                                    binding.placeholderImage.visibility = View.VISIBLE
+                                    binding.placeholderUpdateButton.visibility = View.GONE
                                     showPlaceHolderText(getString(R.string.found_nothing))
                                 } else {
-                                    placeholderImage.visibility = View.GONE
-                                    placeholderUpdateButton.visibility = View.GONE
+                                    binding.placeholderImage.visibility = View.GONE
+                                    binding.placeholderUpdateButton.visibility = View.GONE
                                     showPlaceHolderText("")
                                 }
                             } else {
-                                placeholderImage.setImageResource(R.drawable.ic_server_error)
-                                placeholderImage.visibility = View.VISIBLE
-                                placeholderUpdateButton.visibility = View.VISIBLE
+                                binding.placeholderImage.setImageResource(R.drawable.ic_server_error)
+                                binding.placeholderImage.visibility = View.VISIBLE
+                                binding.placeholderUpdateButton.visibility = View.VISIBLE
                                 showPlaceHolderText(getString(R.string.something_went_wrong))
                             }
                         }
@@ -252,26 +233,26 @@ class SearchActivity : AppCompatActivity() {
 
     fun setHistoryVisibility(isSearchFieldEmpty: Boolean) {
         if (isSearchFieldEmpty) {
-            searchHistoryHeader.visibility = View.VISIBLE
-            searchHistoryClearButton.visibility = View.VISIBLE
+            binding.searchHistoryHeader.visibility = View.VISIBLE
+            binding.clearHistoryButton.visibility = View.VISIBLE
             historyTrackAdapter.updateTracksList(searchHistoryInteractor.getHistoryTracks())
-            recyclerView.adapter = historyTrackAdapter
+            binding.tracksRecyclerView.adapter = historyTrackAdapter
         } else {
-            searchHistoryHeader.visibility = View.GONE
-            searchHistoryClearButton.visibility = View.GONE
+            binding.searchHistoryHeader.visibility = View.GONE
+            binding.clearHistoryButton.visibility = View.GONE
             historyTrackAdapter.updateTracksList(mutableListOf<Track>())
-            recyclerView.adapter = searchTrackAdapter
+            binding.tracksRecyclerView.adapter = searchTrackAdapter
         }
     }
 
     private fun showPlaceHolderText(text: String) {
         if (text.isNotEmpty()) {
-            placeholderMessage.visibility = View.VISIBLE
+            binding.placeholderMessage.visibility = View.VISIBLE
             foundTracks.clear()
             searchTrackAdapter.updateTracksList(foundTracks)
-            placeholderMessage.text = text
+            binding.placeholderMessage.text = text
         } else {
-            placeholderMessage.visibility = View.GONE
+            binding.placeholderMessage.visibility = View.GONE
         }
     }
 }
