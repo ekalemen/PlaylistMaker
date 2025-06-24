@@ -1,21 +1,21 @@
 package com.practicum.playlistmaker.creator
 
 import android.content.Context
-import com.practicum.playlistmaker.data.repository.TracksRepositoryImpl
-import com.practicum.playlistmaker.data.network.RetrofitNetworkClient
-import com.practicum.playlistmaker.data.repository.SearchHistoryRepositoryImpl
-import com.practicum.playlistmaker.data.repository.ThemeRepositoryImpl
-import com.practicum.playlistmaker.domain.api.PlayerInteractor
-import com.practicum.playlistmaker.domain.api.SearchHistoryInteractor
-import com.practicum.playlistmaker.domain.api.SearchHistoryRepository
-import com.practicum.playlistmaker.domain.api.ThemeRepository
-import com.practicum.playlistmaker.domain.api.ThemeSwitcherInteractor
-import com.practicum.playlistmaker.domain.api.TracksInteractor
-import com.practicum.playlistmaker.domain.api.TracksRepository
-import com.practicum.playlistmaker.domain.impl.PlayerInteractorImpl
-import com.practicum.playlistmaker.domain.impl.SearchHistoryInteractorImpl
-import com.practicum.playlistmaker.domain.impl.ThemeSwitcherInteractorImpl
-import com.practicum.playlistmaker.domain.impl.TracksInteractorImpl
+import com.practicum.playlistmaker.search.data.repository.TracksRepositoryImpl
+import com.practicum.playlistmaker.search.data.network.RetrofitNetworkClient
+import com.practicum.playlistmaker.search.data.repository.SearchHistoryRepositoryImpl
+import com.practicum.playlistmaker.settings.data.repository.ThemeRepositoryImpl
+import com.practicum.playlistmaker.player.domain.api.PlayerInteractor
+import com.practicum.playlistmaker.search.domain.api.SearchHistoryInteractor
+import com.practicum.playlistmaker.search.domain.api.SearchHistoryRepository
+import com.practicum.playlistmaker.settings.domain.api.ThemeRepository
+import com.practicum.playlistmaker.settings.domain.api.ThemeSwitcherInteractor
+import com.practicum.playlistmaker.search.domain.api.TracksInteractor
+import com.practicum.playlistmaker.search.domain.api.TracksRepository
+import com.practicum.playlistmaker.player.domain.impl.PlayerInteractorImpl
+import com.practicum.playlistmaker.search.domain.impl.SearchHistoryInteractorImpl
+import com.practicum.playlistmaker.settings.domain.impl.ThemeSwitcherInteractorImpl
+import com.practicum.playlistmaker.search.domain.impl.TracksInteractorImpl
 
 object Creator {
     const val PLAYLIST_MAKER_PREFS = "playlist_maker_prefs"
