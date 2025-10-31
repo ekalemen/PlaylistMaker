@@ -1,9 +1,7 @@
 package com.practicum.playlistmaker.player.domain.impl
 
-import android.media.MediaPlayer
 import com.practicum.playlistmaker.player.domain.api.PlayerInteractor
 import com.practicum.playlistmaker.player.domain.api.PlayerRepository
-import com.practicum.playlistmaker.player.domain.api.PlayerStatus
 
 class PlayerInteractorImpl(private val repository: PlayerRepository): PlayerInteractor {
     override fun preparePlayer(url: String?, onPrepareListenerCallback: () -> (Unit), onCompleteListenerCallback: () -> (Unit)) {
