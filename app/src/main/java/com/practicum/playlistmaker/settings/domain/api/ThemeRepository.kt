@@ -6,4 +6,5 @@ interface ThemeRepository {
     fun getSavedTheme(): PlayListTheme
     fun saveTheme(theme: PlayListTheme)
     fun hasSavedTheme(): Boolean
+    fun switchTheme(theme: PlayListTheme)
 }
