@@ -15,10 +15,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        /*val buttonMainSearch = findViewById<Button>(R.id.main_butt_search)
-        val buttonMainMedia = findViewById<Button>(R.id.main_butt_media)
-        val buttonMainSettings = findViewById<Button>(R.id.main_butt_settings)
-*/
         binding.mainButtSearch.setOnClickListener {
             val searchIntent = Intent(this, SearchActivity::class.java)
             startActivity(searchIntent)

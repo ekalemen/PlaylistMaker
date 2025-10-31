@@ -66,19 +66,19 @@ class SearchViewModel(
 
     fun onClearTrackHistory() {
         searchHistoryInteractor.clearTrackHistory()
-        _historyTracks.postValue(listOf())
-        _searchTracks.postValue(listOf())
+        _historyTracks.postValue(emptyList())
+        _searchTracks.postValue(emptyList())
         _searchTracksScreenState.postValue(SearchTracksScreenState.STATE_DISPLAY_SEARCH_RESULT)
     }
 
     fun searchEditOnFocusChange(focus: Boolean) {
-        if (focus) {
+        if (focus && searchHistoryInteractor.getHistoryTracks().isNotEmpty()) {
             _searchTracksScreenState.postValue(SearchTracksScreenState.STATE_DISPLAY_HISTORY)
         }
     }
 
     fun onSearchTrackTextChanged(searchText: String) {
-        if (searchText.isEmpty()) {
+        if (searchText.isEmpty() && searchHistoryInteractor.getHistoryTracks().isNotEmpty()) {
             _searchTracksScreenState.postValue(SearchTracksScreenState.STATE_DISPLAY_HISTORY)
             _historyTracks.postValue(searchHistoryInteractor.getHistoryTracks())
         } else
@@ -86,7 +86,7 @@ class SearchViewModel(
     }
 
     fun onClearSearchTrackText() {
-        _searchTracks.postValue(listOf())
+        _searchTracks.postValue(emptyList())
         _searchTracksScreenState.postValue(SearchTracksScreenState.STATE_DISPLAY_HISTORY)
     }
 
@@ -113,7 +113,7 @@ class SearchViewModel(
                                     _searchTracks.postValue(searchRes.tracks)
                                     _searchTracksScreenState.postValue(SearchTracksScreenState.STATE_DISPLAY_SEARCH_RESULT)
                                 } else {
-                                    _searchTracks.postValue(listOf())
+                                    _searchTracks.postValue(emptyList())
                                     _searchTracksScreenState.postValue(SearchTracksScreenState.STATE_EMPTY_RESULT)
                                 }
                             } else {
