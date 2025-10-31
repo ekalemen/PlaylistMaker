@@ -2,45 +2,27 @@ package com.practicum.playlistmaker.player.domain.impl
 
 import android.media.MediaPlayer
 import com.practicum.playlistmaker.player.domain.api.PlayerInteractor
+import com.practicum.playlistmaker.player.domain.api.PlayerRepository
 import com.practicum.playlistmaker.player.domain.api.PlayerStatus
 
-class PlayerInteractorImpl: PlayerInteractor {
-    private var playerState: PlayerStatus = PlayerStatus.STATE_DEFAULT
-    private var mediaPlayer = MediaPlayer()
-
+class PlayerInteractorImpl(private val repository: PlayerRepository): PlayerInteractor {
     override fun preparePlayer(url: String?, onPrepareListenerCallback: () -> (Unit), onCompleteListenerCallback: () -> (Unit)) {
-        mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            playerState = PlayerStatus.STATE_PREPARED
-            onPrepareListenerCallback()
-        }
-        mediaPlayer.setOnCompletionListener {
-            playerState = PlayerStatus.STATE_PREPARED
-            onCompleteListenerCallback()
-        }
+        repository.preparePlayer(url, onPrepareListenerCallback, onCompleteListenerCallback)
     }
 
     override fun startPlayer() {
-        mediaPlayer.start()
-        playerState = PlayerStatus.STATE_PLAYING
+     repository.startPlayer()
     }
 
     override fun pausePlayer() {
-        mediaPlayer.pause()
-        playerState = PlayerStatus.STATE_PAUSED
+        repository.pausePlayer()
     }
 
     override fun destroyPlayer() {
-        mediaPlayer.release()
-        playerState = PlayerStatus.STATE_DEFAULT
-    }
-
-    override fun getPlayerStatus(): PlayerStatus {
-        return playerState
+        repository.destroyPlayer()
     }
 
     override fun getPlayerPosition(): Int {
-        return mediaPlayer.currentPosition
+        return repository.getPlayerPosition()
     }
 }
