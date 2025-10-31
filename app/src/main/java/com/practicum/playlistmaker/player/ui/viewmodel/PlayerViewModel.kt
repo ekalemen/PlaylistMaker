@@ -29,11 +29,13 @@ class PlayerViewModel : ViewModel() {
             track.previewUrl,
             {
                 _playerStatus.postValue(PlayerStatus.STATE_PREPARED)
-                _playerPlayingTime.postValue("00:00")
+                _playerPlayingTime.postValue(SimpleDateFormat("mm:ss", Locale.getDefault())
+                    .format(0))
             },
             {
                 _playerStatus.postValue(PlayerStatus.STATE_COMPLETED)
-                _playerPlayingTime.postValue("00:00")
+                _playerPlayingTime.postValue(SimpleDateFormat("mm:ss", Locale.getDefault())
+                    .format(0))
             }
         )
     }

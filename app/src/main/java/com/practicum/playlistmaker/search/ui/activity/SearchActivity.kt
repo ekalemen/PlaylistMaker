@@ -169,6 +169,7 @@ class SearchActivity : AppCompatActivity() {
                 binding.progressBar.visibility = View.GONE
                 binding.placeholderImage.visibility = View.GONE
                 binding.placeholderUpdateButton.visibility = View.GONE
+                binding.placeholderMessage.text = ""
                 binding.searchHistoryHeader.visibility = View.GONE
                 binding.clearHistoryButton.visibility = View.GONE
                 searchTrackAdapter.updateTracksList(foundTracks.toMutableList())
@@ -228,10 +229,8 @@ class SearchActivity : AppCompatActivity() {
     fun playTrack(track: Track) {
         if(clickDebounce()) {
             viewModel.addTrackToHistory(track)
-            val gson = Gson()
-            val trackStr = gson.toJson(track)
             val intent = Intent(this, PlayerActivity::class.java)
-            intent.putExtra(EXTRA_TRACK_INFO, trackStr)
+            intent.putExtra(EXTRA_TRACK_INFO, track)
             startActivity(intent)
         }
     }

@@ -29,35 +29,41 @@ class PlayerActivity : AppCompatActivity() {
         viewModel.playerPlayingTime.observe(this) { time -> renderTrackTime(time) }
 
         val intent = intent
-        val trackStr = intent.getStringExtra(EXTRA_TRACK_INFO)
-        val gson = Gson()
-        val track = gson.fromJson(trackStr, Track::class.java)
+        @Suppress("DEPRECATION")
+        val track = intent.getParcelableExtra<Track>(EXTRA_TRACK_INFO)
 
         binding.playerButtonBack.setOnClickListener {
             finish()
         }
 
-        Glide.with(binding.imageAlbumCover)
-            .load(track.getCoverArtwork())
-            .centerInside()
-            .transform(RoundedCorners( TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 8F, binding.imageAlbumCover.resources.displayMetrics
-            ).toInt()))
-            .placeholder(R.drawable.ic_track_placeholder)
-            .into(binding.imageAlbumCover)
+        if (track != null) {
+            Glide.with(binding.imageAlbumCover)
+                .load(track.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg"))
+                .centerInside()
+                .transform(
+                    RoundedCorners(
+                        TypedValue.applyDimension(
+                            TypedValue.COMPLEX_UNIT_DIP,
+                            8F,
+                            binding.imageAlbumCover.resources.displayMetrics
+                        ).toInt()
+                    )
+                )
+                .placeholder(R.drawable.ic_track_placeholder)
+                .into(binding.imageAlbumCover)
 
-        binding.trackName.text = track.trackName
-        binding.trackArtist.text = track.artistName
-        binding.durationTrack.text = track.trackDuration
-        binding.albumTrack.text = track.collectionName
-        binding.yearTrack.text = track.releaseDate.substring(0,4)
-        binding.genreTRack.text = track.primaryGenreName
-        binding.countryTrack.text = track.country
+            binding.trackName.text = track.trackName
+            binding.trackArtist.text = track.artistName
+            binding.durationTrack.text = track.trackDuration
+            binding.albumTrack.text = track.collectionName
+            binding.yearTrack.text = track.releaseDate.substring(0, 4)
+            binding.genreTRack.text = track.primaryGenreName
+            binding.countryTrack.text = track.country
 
-        previewUrl = track.previewUrl
+            previewUrl = track.previewUrl
 
-        viewModel.preparePlayer(track)
-
+            viewModel.preparePlayer(track)
+        }
         binding.playerButtonPlay.setOnClickListener {
             viewModel.playbackControl()
         }
