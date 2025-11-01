@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.practicum.playlistmaker.settings.domain.api.ThemeSwitcherInteractor
 import com.practicum.playlistmaker.settings.domain.models.PlayListTheme
+import com.practicum.playlistmaker.settings.domain.models.ThemeType
 import com.practicum.playlistmaker.sharing.domain.api.SharingInteractor
 
 class SettingsViewModel(
@@ -46,6 +47,9 @@ class SettingsViewModel(
     }
 
     fun getSavedTheme() {
-        _currentTheme.postValue(themeInteractor.getSavedTheme())
+        if(themeInteractor.getSavedTheme() == null)
+            _currentTheme.postValue(PlayListTheme(ThemeType.LIGHT))
+        else
+            _currentTheme.postValue(themeInteractor.getSavedTheme())
     }
 }

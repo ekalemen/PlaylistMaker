@@ -157,6 +157,7 @@ class SearchActivity : AppCompatActivity() {
                 binding.progressBar.visibility = View.VISIBLE
                 binding.placeholderImage.visibility = View.GONE
                 binding.placeholderUpdateButton.visibility = View.GONE
+                binding.placeholderMessage.text = ""
                 binding.searchHistoryHeader.visibility = View.GONE
                 binding.clearHistoryButton.visibility = View.GONE
                 binding.tracksRecyclerView.visibility = View.GONE
