@@ -3,17 +3,12 @@ package com.practicum.playlistmaker.settings.data.repository
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.settings.domain.api.ThemeRepository
 import com.practicum.playlistmaker.settings.domain.models.PlayListTheme
 import com.practicum.playlistmaker.settings.domain.models.ThemeType
 
-class ThemeRepositoryImpl(context: Context): ThemeRepository {
+class ThemeRepositoryImpl(private val pf: SharedPreferences): ThemeRepository {
     private val themePreference = "theme_switch"
-    private val pf: SharedPreferences = context.getSharedPreferences(
-        Creator.PLAYLIST_MAKER_PREFS,
-        Context.MODE_PRIVATE
-    )
 
     override fun getSavedTheme(): PlayListTheme {
         val theme = pf.getInt(themePreference, ThemeType.LIGHT.ordinal)

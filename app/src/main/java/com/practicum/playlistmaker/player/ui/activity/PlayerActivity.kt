@@ -12,10 +12,11 @@ import com.practicum.playlistmaker.player.domain.api.PlayerStatus
 import com.practicum.playlistmaker.player.ui.viewmodel.PlayerViewModel
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.ui.activity.EXTRA_TRACK_INFO
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
-    private lateinit var viewModel: PlayerViewModel
+    private val viewModel: PlayerViewModel by viewModel()
     private var previewUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,7 +24,6 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[PlayerViewModel::class.java]
         viewModel.playerStatus.observe(this) { status -> renderStatus(status) }
         viewModel.playerPlayingTime.observe(this) { time -> renderTrackTime(time) }
 
