@@ -18,16 +18,6 @@ class SettingsViewModel(
 
     private val _currentTheme = MutableLiveData<PlayListTheme>()
     val currentTheme: LiveData<PlayListTheme> = _currentTheme
-    companion object {
-        fun getViewModelFactory(
-            sharingInteractor: SharingInteractor,
-            themeInteractor: ThemeSwitcherInteractor
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SettingsViewModel(sharingInteractor, themeInteractor)
-            }
-        }
-    }
 
     fun shareApp() {
         sharingInteractor.shareApp()

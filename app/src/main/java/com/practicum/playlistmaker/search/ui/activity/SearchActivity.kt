@@ -14,15 +14,14 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import androidx.lifecycle.ViewModelProvider
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.main.ui.MainActivity
 import com.practicum.playlistmaker.player.ui.activity.PlayerActivity
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchTracksScreenState
 import com.practicum.playlistmaker.search.ui.viewmodel.SearchViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 const val EXTRA_TRACK_INFO = "EXTRA_TRACK_INFO"
 class SearchActivity : AppCompatActivity() {
@@ -38,7 +37,7 @@ class SearchActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
 
-    private lateinit var viewModel: SearchViewModel
+    private val viewModel: SearchViewModel by viewModel()
 
     companion object {
         private const val TEXT_AMOUNT = "TEXT_AMOUNT"
@@ -59,14 +58,6 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(
-            this,
-            SearchViewModel.getViewModelFactory(
-                Creator.provideTracksInteractor(),
-                Creator.provideSearchHistoryInteractor(this)
-            )
-        )[SearchViewModel::class.java]
 
         viewModel.historyTracks.observe(this) { historyTracks = it }
         viewModel.searchTracks.observe(this) { foundTracks = it }
