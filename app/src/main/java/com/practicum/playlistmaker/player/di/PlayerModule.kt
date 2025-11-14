@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.player.di
 
+import android.media.MediaPlayer
 import com.practicum.playlistmaker.player.data.repository.PlayerRepositoryImpl
 import com.practicum.playlistmaker.player.domain.api.PlayerInteractor
 import com.practicum.playlistmaker.player.domain.api.PlayerRepository
@@ -13,8 +14,12 @@ val PlayerModule = module {
         PlayerInteractorImpl(get())
     }
 
+    factory {
+        MediaPlayer()
+    }
+
     factory<PlayerRepository> {
-        PlayerRepositoryImpl()
+        PlayerRepositoryImpl(get())
     }
 
     viewModel {

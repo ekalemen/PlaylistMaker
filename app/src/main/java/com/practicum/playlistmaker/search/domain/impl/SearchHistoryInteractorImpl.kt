@@ -7,11 +7,12 @@ import com.practicum.playlistmaker.search.domain.models.Track
 
 const val HISTORY_SIZE = 10
 
-class SearchHistoryInteractorImpl(private val shRepository: SearchHistoryRepository) :
-    SearchHistoryInteractor {
+class SearchHistoryInteractorImpl(
+    private val shRepository: SearchHistoryRepository,
+    private val gson : Gson
+) :  SearchHistoryInteractor {
 
     private var trackList = mutableListOf<Track>()
-    private val gson = Gson()
 
     override fun getSavedHistory(): MutableList<Track> {
         val str = shRepository.loadTrackHistory()

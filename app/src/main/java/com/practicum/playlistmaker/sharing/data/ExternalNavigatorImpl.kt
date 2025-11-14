@@ -12,7 +12,7 @@ class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.putExtra(Intent.EXTRA_TEXT, link)
         shareIntent.setType("text/plain")
-        val choosenIntent = Intent.createChooser(shareIntent,"Share link")
+        val choosenIntent = Intent.createChooser(shareIntent,context.getString(R.string.share_link_text))
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(choosenIntent)
         

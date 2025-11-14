@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.search.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.gson.Gson
 import com.practicum.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.practicum.playlistmaker.search.data.repository.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.repository.TracksRepositoryImpl
@@ -22,11 +23,15 @@ val SearchModule = module {
     }
 
     factory<SearchHistoryInteractor> {
-        SearchHistoryInteractorImpl(get())
+        SearchHistoryInteractorImpl(get(),get())
     }
 
     factory {
         androidContext().getSharedPreferences("playlist_maker_prefs", Context.MODE_PRIVATE)
+    }
+
+    factory {
+        Gson()
     }
 
     factory<TracksRepository> {
