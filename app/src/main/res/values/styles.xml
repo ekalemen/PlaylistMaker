@@ -176,4 +176,14 @@
         <item name="android:textSize">13sp</item>
         <item name="android:layout_marginTop">16dp</item>
     </style>
+    <style name="TabStyle">
+        <item name="tabTextColor">@color/main_black</item>
+        <item name="tabBackground">@color/white</item>
+        <item name="tabIndicatorColor">@color/main_black</item>
+        <item name="tabIndicatorFullWidth">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="tabIndicatorHeight">2dp</item>
+        <item name="fontFamily">@font/ys_text_medium</item>
+    </style>
 </resources>

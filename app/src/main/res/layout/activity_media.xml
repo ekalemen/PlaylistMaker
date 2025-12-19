@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".media.ui.MediaActivity">
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="24dp">
+
+        <ImageView
+            style="@style/SettingsTopHeaderImageView"
+            android:id="@+id/media_button_back"
+            android:src="@drawable/settings_arrow_back" />
+
+        <TextView
+            style="@style/SettingsTopHeaderTextView"
+            android:text="@string/media_text" />
+    </LinearLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        style="@style/TabStyle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/media_text"
-        android:textAllCaps="false"
-        android:textColor="@color/main_black"
-        android:textSize="@dimen/main_text_size"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

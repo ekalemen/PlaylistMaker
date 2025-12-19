@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker
 
 import android.app.Application
+import com.practicum.playlistmaker.media.di.MediaKoinModule
 import com.practicum.playlistmaker.settings.domain.api.ThemeSwitcherInteractor
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
@@ -16,7 +17,7 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(PlayerModule, SettingsModule, SearchModule)
+            modules(PlayerModule, SettingsModule, SearchModule, MediaKoinModule)
         }
 
         themeSwitcher.switchThemeSaved()
